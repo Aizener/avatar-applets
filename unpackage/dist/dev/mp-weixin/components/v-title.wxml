@@ -1,0 +1,1 @@
+<view class="v-title flex flex-row-between flex-col-center"><text class="v-title--main">热门头像</text><view class="v-title--operate flex flex-col-center"><text>更多</text><u-icon class="logo" vue-id="2858c520-1" size="24" name="arrow-right" bind:__l="__l"></u-icon></view></view>

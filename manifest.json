@@ -46,13 +46,29 @@
             "sdkConfigs" : {}
         }
     },
+    "h5" : {
+        "devServer" : {
+            "disableHostCheck" : true, // 开启可以用自己的域名
+            "proxy" : {
+                "/api" : {
+                    "target" : "https://ddvlhr.red/pic-shot/",
+                    "changeOrigin" : true,
+                    "secure" : false,
+                    "pathRewrite" : {
+                        "/api" : ""
+                    }
+                }
+            }
+        }
+    },
     /* 快应用特有相关 */
     "quickapp" : {},
     /* 小程序特有相关 */
     "mp-weixin" : {
-        "appid" : "",
+        "appid" : "wx3a0ca6446e8c0441",
         "setting" : {
-            "urlCheck" : false
+            "urlCheck" : false,
+            "minified" : false
         },
         "usingComponents" : true
     },
