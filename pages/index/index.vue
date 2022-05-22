@@ -90,7 +90,7 @@
 			</view>
 			<u-loadmore :status="status" class="flex flex-row-center py-30" />
 		</view>
-		<!-- <u-skeleton :loading="loadingSkeleton" :animation="true" bgColor="#FFF"></u-skeleton> -->
+		<u-skeleton :loading="loadingSkeleton" :animation="true" bgColor="#FFF"></u-skeleton>
 	</view>
 </template>
 

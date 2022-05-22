@@ -186,44 +186,82 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 var _default =
 {
   data: function data() {
     return {
-      flowList: [
-        // { imageUrl: 'https://img0.baidu.com/it/u=3594725999,1437276298&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=281' },
-        // { imageUrl: 'https://img2.baidu.com/it/u=1305248331,3698728375&fm=253&fmt=auto&app=138&f=JPEG?w=889&h=500' },
-        // { imageUrl: 'https://img1.baidu.com/it/u=1335955050,3868593504&fm=253&fmt=auto&app=120&f=JPEG?w=1200&h=502' },
-        // { imageUrl: 'https://img1.baidu.com/it/u=1875739781,4152007440&fm=253&fmt=auto&app=120&f=JPEG?w=1024&h=576' },
-        // { imageUrl: 'https://img2.baidu.com/it/u=924133470,1725987117&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=281' },
-        // { imageUrl: 'https://img0.baidu.com/it/u=155276595,173864794&fm=253&fmt=auto&app=120&f=JPEG?w=889&h=500' },
-      ],
+      flowList: [],
       status: 'loadmore',
       info: null,
       page: 0,
-      size: 30 };
+      size: 30,
+      query: {},
+      from: '',
+      activeCategory: '' };
 
   },
   onLoad: function onLoad(e) {
     this.params = JSON.parse(decodeURIComponent(e.params));
+    this.from = this.params.from;
+    this.activeCategory = this.params.name;
     this.getData();
   },
   onReady: function onReady() {
     this.$setTitle(this.params.name);
   },
+  onReachBottom: function onReachBottom() {
+    this.page++;
+    this.getImageList();
+  },
   methods: {
     getData: function getData() {var _this = this;return _asyncToGenerator( /*#__PURE__*/_regenerator.default.mark(function _callee() {return _regenerator.default.wrap(function _callee$(_context) {while (1) {switch (_context.prev = _context.next) {case 0:
-                _this.getImageList();case 1:case "end":return _context.stop();}}}, _callee);}))();
+                _this.setQuery();
+                _this.getImageList();case 2:case "end":return _context.stop();}}}, _callee);}))();
+    },
+    setQuery: function setQuery() {
+      if (this.params.from === 'search') {
+        this.query = {
+          queryJson: JSON.stringify([{
+            paramName: 'fuzzyQuery',
+            paramValue: this.params.name,
+            operator: 6 }]) };
+
+
+      } else if (this.params.from === 'top') {
+        this.query = {
+          pageIndex: 0,
+          pageSize: 30,
+          direction: 'desc',
+          sortName: this.params.field };
+
+      } else if (this.params.from === 'tag') {
+        this.query = {
+          queryJson: JSON.stringify([{
+            paramName: 'tagId',
+            paramValue: this.params.tagId,
+            operator: 0 }]) };
+
+
+      } else if (this.params.from === 'category') {
+        this.query = {
+          queryJson: JSON.stringify([{
+            paramName: 'categoryId',
+            paramValue: this.params.categoryId,
+            operator: 0 }]) };
+
+
+      }
     },
     getImageList: function getImageList() {var _this2 = this;return _asyncToGenerator( /*#__PURE__*/_regenerator.default.mark(function _callee2() {var res;return _regenerator.default.wrap(function _callee2$(_context2) {while (1) {switch (_context2.prev = _context2.next) {case 0:
                 _this2.status = 'loading';_context2.next = 3;return (
-                  _this2.$u.api.getImageList({
-                    queryJson: JSON.stringify([{
-                      paramName: 'fuzzyQuery',
-                      paramValue: _this2.params.name,
-                      operator: 6 }]) }));case 3:res = _context2.sent;
-
-
+                  _this2.$u.api.getImageList(_this2.query));case 3:res = _context2.sent;
                 if (res.code === 200) {
                   if (_this2.flowList.length >= res.data.totalElements) {
                     _this2.status = 'nomore';
@@ -235,9 +273,14 @@ var _default =
     },
     handleClickItem: function handleClickItem(item) {
       uni.navigateTo({
-        url: '/pages/detail/detail',
-        info: JSON.stringify(item) });
+        url: "/pages/detail/detail?info=".concat(JSON.stringify(item)) });
 
+    },
+    handleSwitchCategory: function handleSwitchCategory(type) {
+      this.activeCategory = ['下载榜', '热度榜', '收藏榜'][type];
+      this.params.field = ['downloadNum', 'hotNum', 'collectionNum'][type];
+      this.flowList = [];
+      this.getImageList();
     },
     redirectToIndexPage: function redirectToIndexPage() {
       uni.redirectTo({

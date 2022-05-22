@@ -11,6 +11,15 @@ export default {
 			uni.setNavigationBarTitle({
 				title
 			})
+		},
+		Vue.prototype.$showLoading = (title = '加载中', mask = false) => {
+			uni.showLoading({
+				title,
+				mask
+			})
+		},
+		Vue.prototype.$hideLoading = () => {
+			uni.hideLoading()
 		}
 	}
 }

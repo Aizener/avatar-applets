@@ -62,6 +62,34 @@
           "query": "",
           "launchMode": "default",
           "scene": null
+        },
+        {
+          "name": "",
+          "pathName": "pages/flowlist/flowlist",
+          "query": "params=%7B%22name%22%3A%22%E4%B8%8B%E8%BD%BD%E6%A6%9C%22%2C%22from%22%3A%22category%22%2C%22field%22%3A%22downloadNum%22%7D",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "",
+          "pathName": "pages/detail/detail",
+          "query": "info=%7B%22id%22%3A%221%22%2C%22name%22%3A%22fuck%22%2C%22imageUrl%22%3A%22https%3A%2F%2Fportrait.gitee.com%2Fuploads%2Favatars%2Fuser%2F584%2F1754470_tomonori_1592376451.png!avatar200%22%2C%22width%22%3A11%2C%22height%22%3A11%2C%22price%22%3A1%2C%22isStar%22%3A0%2C%22downloadNum%22%3A0%2C%22collectNum%22%3A0%2C%22viewNum%22%3A0%2C%22desc%22%3Anull%2C%22dataState%22%3A2%2C%22createdTime%22%3A%221111%22%2C%22creatorId%22%3A%22111%22%2C%22updatedTime%22%3A%221111%22%2C%22updatorId%22%3A%221111%22%2C%22tagList%22%3Anull%2C%22classifyList%22%3Anull%2C%22tagIds%22%3A%222%2C1%22%2C%22tagName%22%3A%22Shit%2CFucker%22%2C%22classifyIds%22%3A%221%2C2%22%2C%22classifyName%22%3A%22%E7%94%B7%E5%90%8C%E5%A4%B4%E5%83%8F%2C%E6%89%93%E9%A3%9E%E6%9C%BA%E5%A4%B4%E5%83%8F%22%7D",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "",
+          "pathName": "pages/category/category",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "",
+          "pathName": "pages/detail/detail",
+          "query": "info=%7B%22id%22%3A%221%22%2C%22name%22%3A%22fuck%22%2C%22imageUrl%22%3A%22https%3A%2F%2Fportrait.gitee.com%2Fuploads%2Favatars%2Fuser%2F584%2F1754470_tomonori_1592376451.png!avatar200%22%2C%22width%22%3A11%2C%22height%22%3A11%2C%22price%22%3A1%2C%22isStar%22%3A0%2C%22downloadNum%22%3A0%2C%22collectNum%22%3A0%2C%22viewNum%22%3A0%2C%22desc%22%3Anull%2C%22dataState%22%3A2%2C%22createdTime%22%3A%221111%22%2C%22creatorId%22%3A%22111%22%2C%22updatedTime%22%3A%221111%22%2C%22updatorId%22%3A%221111%22%2C%22tagList%22%3Anull%2C%22classifyList%22%3Anull%2C%22tagIds%22%3A%222%2C1%22%2C%22tagName%22%3A%22Shit%2CFucker%22%2C%22classifyIds%22%3A%221%2C2%22%2C%22classifyName%22%3A%22%E7%94%B7%E5%90%8C%E5%A4%B4%E5%83%8F%2C%E6%89%93%E9%A3%9E%E6%9C%BA%E5%A4%B4%E5%83%8F%22%7D",
+          "launchMode": "default",
+          "scene": null
         }
       ]
     }

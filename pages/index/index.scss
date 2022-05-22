@@ -1,3 +1,6 @@
+.index {
+	min-height: calc(100vh - var(--window-top) - var(--window-bottom));
+}
 .navbar {
 	width: 100%;
 	position: fixed;
@@ -9,7 +12,7 @@
 	flex-direction: column;
 	justify-content: flex-end;
 	&-title {
-		font-size: 42rpx;
+		font-size: 50rpx;
 	}
 	&-logo {
 		width: 50rpx;

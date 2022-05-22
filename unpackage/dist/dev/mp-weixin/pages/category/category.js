@@ -93,6 +93,29 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "recyclableRender", function() { return recyclableRender; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "components", function() { return components; });
 var components
+try {
+  components = {
+    uSkeleton: function() {
+      return __webpack_require__.e(/*! import() | uview-ui/components/u-skeleton/u-skeleton */ "uview-ui/components/u-skeleton/u-skeleton").then(__webpack_require__.bind(null, /*! @/uview-ui/components/u-skeleton/u-skeleton.vue */ 200))
+    }
+  }
+} catch (e) {
+  if (
+    e.message.indexOf("Cannot find module") !== -1 &&
+    e.message.indexOf(".vue") !== -1
+  ) {
+    console.error(e.message)
+    console.error("1. 排查组件名称拼写是否正确")
+    console.error(
+      "2. 排查组件是否符合 easycom 规范，文档：https://uniapp.dcloud.net.cn/collocation/pages?id=easycom"
+    )
+    console.error(
+      "3. 若组件不符合 easycom 规范，需手动引入，并在 components 中注册该组件"
+    )
+  } else {
+    throw e
+  }
+}
 var render = function() {
   var _vm = this
   var _h = _vm.$createElement
@@ -130,7 +153,8 @@ __webpack_require__.r(__webpack_exports__);
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0; //
+/* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _regenerator = _interopRequireDefault(__webpack_require__(/*! ./node_modules/@babel/runtime/regenerator */ 24));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {try {var info = gen[key](arg);var value = info.value;} catch (error) {reject(error);return;}if (info.done) {resolve(value);} else {Promise.resolve(value).then(_next, _throw);}}function _asyncToGenerator(fn) {return function () {var self = this,args = arguments;return new Promise(function (resolve, reject) {var gen = fn.apply(self, args);function _next(value) {asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);}function _throw(err) {asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);}_next(undefined);});};} //
+//
 //
 //
 //
@@ -177,10 +201,66 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 var _default =
 {
   data: function data() {
-    return {};
+    return {
+      categories: [],
+      tags: [],
+      loadingSkeleton: true };
+
+  },
+  onLoad: function onLoad() {
+    this.getData();
+  },
+  methods: {
+    getData: function getData() {var _this = this;
+      Promise.all([
+      this.getAllClassify(),
+      this.getTagList()]).
+      finally(function () {
+        _this.loadingSkeleton = false;
+      });
+    },
+    getAllClassify: function getAllClassify() {var _this2 = this;return _asyncToGenerator( /*#__PURE__*/_regenerator.default.mark(function _callee() {var res;return _regenerator.default.wrap(function _callee$(_context) {while (1) {switch (_context.prev = _context.next) {case 0:_context.next = 2;return (
+                  _this2.$u.api.getAllClassify());case 2:res = _context.sent;
+                if (res.code === 200) {
+                  _this2.categories = res.data.list;
+                }case 4:case "end":return _context.stop();}}}, _callee);}))();
+    },
+    getTagList: function getTagList() {var _this3 = this;return _asyncToGenerator( /*#__PURE__*/_regenerator.default.mark(function _callee2() {var res;return _regenerator.default.wrap(function _callee2$(_context2) {while (1) {switch (_context2.prev = _context2.next) {case 0:_context2.next = 2;return (
+                  _this3.$u.api.getTagList());case 2:res = _context2.sent;
+                if (res.code === 200) {
+                  _this3.tags = res.data.list;
+                }case 4:case "end":return _context2.stop();}}}, _callee2);}))();
+    },
+    handleClickTag: function handleClickTag(item) {
+      uni.navigateTo({
+        url: "/pages/flowlist/flowlist?params=".concat(JSON.stringify({
+          name: '标签-' + item.name,
+          from: 'tag',
+          tagId: item.id })) });
 
 
-  } };exports.default = _default;
+    },
+    handleClickCategory: function handleClickCategory(item) {
+      uni.navigateTo({
+        url: "/pages/flowlist/flowlist?params=".concat(JSON.stringify({
+          name: '分类-' + item.name,
+          from: 'category',
+          categoryId: item.id })) });
+
+
+    },
+    navigatorFlowList: function navigatorFlowList(type) {
+      var names = ['下载榜', '热度榜', '收藏榜'];
+      var fields = ['downloadNum', 'viewNum', 'collectNum'];
+      uni.navigateTo({
+        url: "/pages/flowlist/flowlist?params=".concat(JSON.stringify({
+          name: names[type],
+          from: 'top',
+          field: fields[type] })) });
+
+
+    } } };exports.default = _default;
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
 
 /***/ }),
 

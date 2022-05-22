@@ -1,5 +1,12 @@
 <template>
-	<view class="loadmore px-30 py-10">
+	<view class="loadmore px-30 py-10" :style="{ paddingTop: from === 'top' ? '112rpx' : '' }">
+		<view class="loadmore-top" v-if="from === 'top'">
+			<view class="list">
+				<view class="list-item download" :class="[activeCategory === '下载榜' && 'active']" @click="handleSwitchCategory(0)">下载榜</view>
+				<view class="list-item hot" :class="[activeCategory === '热度榜' && 'active']" @click="handleSwitchCategory(1)">热度榜</view>
+				<view class="list-item like" :class="[activeCategory === '收藏榜' && 'active']" @click="handleSwitchCategory(2)">收藏榜</view>
+			</view>
+		</view>
 		<view class="loadmore-list">
 			<view
 				class="loadmore-list--item"
@@ -29,40 +36,71 @@
 	export default {
 		data() {
 			return {
-				flowList: [
-					// { imageUrl: 'https://img0.baidu.com/it/u=3594725999,1437276298&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=281' },
-					// { imageUrl: 'https://img2.baidu.com/it/u=1305248331,3698728375&fm=253&fmt=auto&app=138&f=JPEG?w=889&h=500' },
-					// { imageUrl: 'https://img1.baidu.com/it/u=1335955050,3868593504&fm=253&fmt=auto&app=120&f=JPEG?w=1200&h=502' },
-					// { imageUrl: 'https://img1.baidu.com/it/u=1875739781,4152007440&fm=253&fmt=auto&app=120&f=JPEG?w=1024&h=576' },
-					// { imageUrl: 'https://img2.baidu.com/it/u=924133470,1725987117&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=281' },
-					// { imageUrl: 'https://img0.baidu.com/it/u=155276595,173864794&fm=253&fmt=auto&app=120&f=JPEG?w=889&h=500' },
-				],
+				flowList: [],
 				status: 'loadmore',
 				info: null,
 				page: 0,
-				size: 30
+				size: 30,
+				query: {},
+				from: '',
+				activeCategory: ''
 			};
 		},
 		onLoad(e) {
 			this.params = JSON.parse(decodeURIComponent(e.params))
+			this.from = this.params.from
+			this.activeCategory = this.params.name
 			this.getData()
 		},
 		onReady() {
 			this.$setTitle(this.params.name)
 		},
+		onReachBottom() {
+			this.page ++
+			this.getImageList()
+		},
 		methods: {
 			async getData() {
+				this.setQuery()
 				this.getImageList()
+			},
+			setQuery() {
+				if (this.params.from === 'search') {
+					this.query = {
+						queryJson: JSON.stringify([{
+							paramName: 'fuzzyQuery',
+							paramValue: this.params.name,
+							operator: 6
+						}])
+					}
+				} else if (this.params.from === 'top') {
+					this.query = {
+						pageIndex: 0,
+						pageSize: 30,
+						direction: 'desc',
+						sortName: this.params.field
+					}
+				} else if (this.params.from === 'tag') {
+					this.query = {
+						queryJson: JSON.stringify([{
+							paramName: 'tagId',
+							paramValue: this.params.tagId,
+							operator: 0
+						}])
+					} 
+				} else if (this.params.from === 'category') {
+					this.query = {
+						queryJson: JSON.stringify([{
+							paramName: 'categoryId',
+							paramValue: this.params.categoryId,
+							operator: 0
+						}])
+					} 
+				}
 			},
 			async getImageList() {
 				this.status = 'loading'
-				const res = await this.$u.api.getImageList({
-					queryJson: JSON.stringify([{
-						paramName: 'fuzzyQuery',
-						paramValue: this.params.name,
-						operator: 6
-					}])
-				})
+				const res = await this.$u.api.getImageList(this.query)
 				if (res.code === 200) {
 					if (this.flowList.length >= res.data.totalElements) {
 						this.status = 'nomore'
@@ -74,9 +112,14 @@
 			},
 			handleClickItem(item) {
 				uni.navigateTo({
-					url: '/pages/detail/detail',
-					info: JSON.stringify(item)
+					url: `/pages/detail/detail?info=${JSON.stringify(item)}`
 				})
+			},
+			handleSwitchCategory(type) {
+				this.activeCategory = ['下载榜', '热度榜', '收藏榜'][type]
+				this.params.field = ['downloadNum', 'hotNum', 'collectionNum'][type]
+				this.flowList = []
+				this.getImageList()
 			},
 			redirectToIndexPage() {
 				uni.redirectTo({
@@ -142,6 +185,43 @@
 			border-radius: 50rpx;
 			margin-top: 20rpx;
 			background-color: orange;
+		}
+	}
+	
+	&-top {
+		position: fixed;
+		left: 0; top: 0;
+		width: 100%;
+		background-color: #fff;
+		z-index: 10;
+		display: flex;
+		justify-content: center;
+		padding: 30rpx 0;
+		height: 112rpx;	
+		.list {
+			display: flex;
+			justify-content: center;
+			&-item {
+				padding: 10rpx 30rpx;
+				font-size: 24rpx;
+				color: #fff;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				margin: 0 10rpx;
+				border-radius: 30rpx;
+				background-color: #ccc;
+				transition: all .3s;
+				&.active.download {
+					background: linear-gradient(120deg, #2E8B57 20%, green 50%, #2E8B57 80%);
+				}
+				&.active.hot {
+					background: linear-gradient(120deg, #1E90FF	20%, #4169E1 50%, #1E90FF 80%);
+				}
+				&.active.like {
+					background: linear-gradient(120deg, #FF69B4	20%, #FF1493 50%, #FF69B4 80%);
+				}
+			}
 		}
 	}
 }

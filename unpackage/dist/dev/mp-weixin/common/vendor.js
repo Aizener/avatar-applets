@@ -13844,7 +13844,9 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
     getClassifyImageList: function getClassifyImageList() {var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};return vm.$u.post('/classify/getClassifyImageList', params);},
     getImageList: function getImageList() {var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};return vm.$u.post('/image/getImageList', params);},
     getCurrentGroupBannerList: function getCurrentGroupBannerList() {var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};return vm.$u.post('/banner/getCurrentGroupBannerList', params);},
-    getImageInfo: function getImageInfo() {var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};return vm.$u.post('/image/getImageInfo', params);} };};var _default =
+    getImageInfo: function getImageInfo() {var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};return vm.$u.post('/image/getImageInfo', params);},
+    getTagList: function getTagList() {var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};return vm.$u.post('/tag/getTagList', params);},
+    getAllClassify: function getAllClassify() {var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};return vm.$u.post('/classify/getAllClassify', params);} };};var _default =
 
 
 initApis;exports.default = _default;
@@ -13871,6 +13873,15 @@ initApis;exports.default = _default;
       uni.setNavigationBarTitle({
         title: title });
 
+    },
+    Vue.prototype.$showLoading = function () {var title = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '加载中';var mask = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+      uni.showLoading({
+        title: title,
+        mask: mask });
+
+    },
+    Vue.prototype.$hideLoading = function () {
+      uni.hideLoading();
     };
   } };exports.default = _default;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
@@ -13986,20 +13997,21 @@ __webpack_require__.r(__webpack_exports__);
         _this.tabTop = res.top - res.height;
       }).exec();
     },
-    getData: function getData() {var _this2 = this;return _asyncToGenerator( /*#__PURE__*/_regenerator.default.mark(function _callee() {return _regenerator.default.wrap(function _callee$(_context) {while (1) {switch (_context.prev = _context.next) {case 0:
-                // await this.getCurrentGroupBannerList()
-                // await this.getHotImageList()
-                // await this.getRecommendClassify()
-                // await this.getNewImageList()
-                Promise.all([
-                _this2.getCurrentGroupBannerList(),
-                _this2.getHotImageList(),
-                _this2.getRecommendClassify(),
-                _this2.getNewImageList()]).
-                then(function () {
-                  _this2.loadingSkeleton = false;
-                });case 1:case "end":return _context.stop();}}}, _callee);}))();
-    },
+    getData: function getData() {var _this2 = this;return _asyncToGenerator( /*#__PURE__*/_regenerator.default.mark(function _callee() {return _regenerator.default.wrap(function _callee$(_context) {while (1) {switch (_context.prev = _context.next) {case 0:_context.next = 2;return (
+                  _this2.getCurrentGroupBannerList());case 2:_context.next = 4;return (
+                  _this2.getHotImageList());case 4:_context.next = 6;return (
+                  _this2.getRecommendClassify());case 6:_context.next = 8;return (
+                  _this2.getNewImageList());case 8:
+                _this2.loadingSkeleton = false;
+                // Promise.all([
+                // 	this.getCurrentGroupBannerList(),
+                // 	this.getHotImageList(),
+                // 	this.getRecommendClassify(),
+                // 	this.getNewImageList()
+                // ]).then(() => {
+                // 	this.loadingSkeleton = false
+                // })
+              case 9:case "end":return _context.stop();}}}, _callee);}))();},
     getCurrentGroupBannerList: function getCurrentGroupBannerList() {var _this3 = this;return _asyncToGenerator( /*#__PURE__*/_regenerator.default.mark(function _callee2() {var res;return _regenerator.default.wrap(function _callee2$(_context2) {while (1) {switch (_context2.prev = _context2.next) {case 0:_context2.next = 2;return (
                   _this3.$u.api.getCurrentGroupBannerList());case 2:res = _context2.sent;
                 if (res.code === 200) {
@@ -14011,7 +14023,7 @@ __webpack_require__.r(__webpack_exports__);
                     pageIndex: 0,
                     pageSize: 10,
                     direction: 'desc',
-                    sortName: 'updatedTime' }));case 2:res = _context3.sent;
+                    sortName: 'viewNum' }));case 2:res = _context3.sent;
 
                 if (res.code === 200) {
                   _this4.hotList = res.data.content;
@@ -14047,9 +14059,13 @@ __webpack_require__.r(__webpack_exports__);
     getFlowList: function getFlowList() {var _this7 = this;return _asyncToGenerator( /*#__PURE__*/_regenerator.default.mark(function _callee6() {var res;return _regenerator.default.wrap(function _callee6$(_context6) {while (1) {switch (_context6.prev = _context6.next) {case 0:
                 _this7.status = 'loading';_context6.next = 3;return (
                   _this7.$u.api.getClassifyImageList({
-                    classifyId: _this7.tabList[_this7.current].id,
                     pageIndex: _this7.tabParams.page,
-                    pageSize: _this7.tabParams.size }));case 3:res = _context6.sent;
+                    pageSize: _this7.tabParams.size,
+                    queryJson: JSON.stringify([{
+                      paramName: 'classifyId',
+                      paramValue: _this7.tabList[_this7.current].id,
+                      operator: 0 }]) }));case 3:res = _context6.sent;
+
 
                 if (res.code === 200) {
                   _this7.flowList = res.data.content;

@@ -25,6 +25,9 @@
 /* 透明度 */
 /* 文章场景相关 */
 /* uni.scss */
+.index {
+  min-height: calc(100vh - 0px - 0px);
+}
 .navbar {
   width: 100%;
   position: fixed;
@@ -38,7 +41,7 @@
   justify-content: flex-end;
 }
 .navbar-title {
-  font-size: 42rpx;
+  font-size: 50rpx;
 }
 .navbar-logo {
   width: 50rpx;

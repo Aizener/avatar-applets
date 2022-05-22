@@ -14,21 +14,33 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "recyclableRender", function() { return recyclableRender; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "components", function() { return components; });
 var components
+try {
+  components = {
+    uSkeleton: function() {
+      return __webpack_require__.e(/*! import() | uview-ui/components/u-skeleton/u-skeleton */ "uview-ui/components/u-skeleton/u-skeleton").then(__webpack_require__.bind(null, /*! @/uview-ui/components/u-skeleton/u-skeleton.vue */ 200))
+    }
+  }
+} catch (e) {
+  if (
+    e.message.indexOf("Cannot find module") !== -1 &&
+    e.message.indexOf(".vue") !== -1
+  ) {
+    console.error(e.message)
+    console.error("1. 排查组件名称拼写是否正确")
+    console.error(
+      "2. 排查组件是否符合 easycom 规范，文档：https://uniapp.dcloud.net.cn/collocation/pages?id=easycom"
+    )
+    console.error(
+      "3. 若组件不符合 easycom 规范，需手动引入，并在 components 中注册该组件"
+    )
+  } else {
+    throw e
+  }
+}
 var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  var l0 = _vm.info ? _vm.info.tagName.split(",") : null
-  var l1 = _vm.info ? _vm.info.classifyName.split(",") : null
-  _vm.$mp.data = Object.assign(
-    {},
-    {
-      $root: {
-        l0: l0,
-        l1: l1
-      }
-    }
-  )
 }
 var recyclableRender = false
 var staticRenderFns = []
@@ -62,7 +74,12 @@ __webpack_require__.r(__webpack_exports__);
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _regenerator = _interopRequireDefault(__webpack_require__(/*! ./node_modules/@babel/runtime/regenerator */ 24));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {try {var info = gen[key](arg);var value = info.value;} catch (error) {reject(error);return;}if (info.done) {resolve(value);} else {Promise.resolve(value).then(_next, _throw);}}function _asyncToGenerator(fn) {return function () {var self = this,args = arguments;return new Promise(function (resolve, reject) {var gen = fn.apply(self, args);function _next(value) {asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);}function _throw(err) {asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);}_next(undefined);});};} //
+/* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _regenerator = _interopRequireDefault(__webpack_require__(/*! ./node_modules/@babel/runtime/regenerator */ 24));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {try {var info = gen[key](arg);var value = info.value;} catch (error) {reject(error);return;}if (info.done) {resolve(value);} else {Promise.resolve(value).then(_next, _throw);}}function _asyncToGenerator(fn) {return function () {var self = this,args = arguments;return new Promise(function (resolve, reject) {var gen = fn.apply(self, args);function _next(value) {asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);}function _throw(err) {asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);}_next(undefined);});};} //
+//
+//
+//
+//
+//
 //
 //
 //
@@ -104,25 +121,61 @@ var _default =
 {
   data: function data() {
     return {
-      info: null };
+      info: null,
+      loadingSkeleton: true };
 
   },
   onLoad: function onLoad(e) {
-    this.info = JSON.parse(decodeURIComponent(e.info));
+    var info = JSON.parse(decodeURIComponent(e.info));
+    this.id = info.id;
+    this.name = info.name;
     this.getData();
   },
   onReady: function onReady() {
-    this.$setTitle('图片详情-' + this.info.name);
+    this.$setTitle('图片详情-' + this.name);
   },
   methods: {
     getData: function getData() {var _this = this;return _asyncToGenerator( /*#__PURE__*/_regenerator.default.mark(function _callee() {var res;return _regenerator.default.wrap(function _callee$(_context) {while (1) {switch (_context.prev = _context.next) {case 0:_context.next = 2;return (
                   _this.$u.api.getImageInfo({
-                    imageId: _this.info.id }));case 2:res = _context.sent;
+                    imageId: _this.id }));case 2:res = _context.sent;
 
+                _this.loadingSkeleton = false;
                 if (res.code === 200) {
                   _this.info = res.data;
-                }case 4:case "end":return _context.stop();}}}, _callee);}))();
+                }case 5:case "end":return _context.stop();}}}, _callee);}))();
+    },
+    handleClickTag: function handleClickTag(item) {
+      uni.redirectTo({
+        url: "/pages/flowlist/flowlist?params=".concat(JSON.stringify({
+          name: '标签-' + item.name,
+          from: 'tag',
+          tagId: item.id })) });
+
+
+    },
+    handleDownload: function handleDownload() {var _this2 = this;
+      this.$showLoading('保存中');
+      uni.downloadFile({
+        url: this.info.imageUrl,
+        success: function success(file) {
+          uni.saveImageToPhotosAlbum({
+            filePath: file.tempFilePath,
+            success: function success(res) {
+              _this2.$toast('保存成功');
+            },
+            fail: function fail(err) {
+              setTimeout(function () {
+                _this2.$toast('保存失败：' + err.errMsg);
+              }, 500);
+            },
+            complete: function complete() {
+              _this2.$hideLoading();
+            } });
+
+        } });
+
     } } };exports.default = _default;
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
 
 /***/ }),
 

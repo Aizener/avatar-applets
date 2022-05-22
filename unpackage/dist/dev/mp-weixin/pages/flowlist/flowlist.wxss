@@ -79,4 +79,41 @@
   margin-top: 20rpx;
   background-color: orange;
 }
+.loadmore-top {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  background-color: #fff;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  padding: 30rpx 0;
+  height: 112rpx;
+}
+.loadmore-top .list {
+  display: flex;
+  justify-content: center;
+}
+.loadmore-top .list-item {
+  padding: 10rpx 30rpx;
+  font-size: 24rpx;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 10rpx;
+  border-radius: 30rpx;
+  background-color: #ccc;
+  transition: all .3s;
+}
+.loadmore-top .list-item.active.download {
+  background: linear-gradient(120deg, #2E8B57 20%, green 50%, #2E8B57 80%);
+}
+.loadmore-top .list-item.active.hot {
+  background: linear-gradient(120deg, #1E90FF 20%, #4169E1 50%, #1E90FF 80%);
+}
+.loadmore-top .list-item.active.like {
+  background: linear-gradient(120deg, #FF69B4 20%, #FF1493 50%, #FF69B4 80%);
+}
 

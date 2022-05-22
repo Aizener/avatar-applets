@@ -25,12 +25,15 @@
 /* 透明度 */
 /* 文章场景相关 */
 /* uni.scss */
+.category {
+  min-height: calc(100vh - 0px - 0px);
+}
 .category-list {
   display: flex;
   flex-wrap: wrap;
 }
 .category-list--item {
-  width: 320rpx;
+  flex: 1;
   color: #fff;
   display: flex;
   justify-content: center;
@@ -74,6 +77,15 @@
   overflow: hidden;
   position: relative;
   margin-top: 20rpx;
+}
+.category-content--list .category-item::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  box-shadow: 0 -15px 20px inset #333;
 }
 .category-content--list .category-item image {
   width: 100%;

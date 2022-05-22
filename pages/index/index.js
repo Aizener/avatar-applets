@@ -58,18 +58,19 @@ export default {
 			}).exec()
 		},
 		async getData() {
-			// await this.getCurrentGroupBannerList()
-			// await this.getHotImageList()
-			// await this.getRecommendClassify()
-			// await this.getNewImageList()
-			Promise.all([
-				this.getCurrentGroupBannerList(),
-				this.getHotImageList(),
-				this.getRecommendClassify(),
-				this.getNewImageList()
-			]).then(() => {
-				this.loadingSkeleton = false
-			})
+			await this.getCurrentGroupBannerList()
+			await this.getHotImageList()
+			await this.getRecommendClassify()
+			await this.getNewImageList()
+			this.loadingSkeleton = false
+			// Promise.all([
+			// 	this.getCurrentGroupBannerList(),
+			// 	this.getHotImageList(),
+			// 	this.getRecommendClassify(),
+			// 	this.getNewImageList()
+			// ]).then(() => {
+			// 	this.loadingSkeleton = false
+			// })
 		},
 		async getCurrentGroupBannerList() {
 			const res = await this.$u.api.getCurrentGroupBannerList()
@@ -82,7 +83,7 @@ export default {
 				pageIndex: 0,
 				pageSize: 10,
 				direction: 'desc',
-				sortName: 'updatedTime'
+				sortName: 'viewNum'
 			})
 			if (res.code === 200) {
 				this.hotList = res.data.content
@@ -118,9 +119,13 @@ export default {
 		async getFlowList() {
 			this.status = 'loading'
 			const res = await this.$u.api.getClassifyImageList({
-				classifyId: this.tabList[this.current].id,
 				pageIndex: this.tabParams.page,
-				pageSize: this.tabParams.size
+				pageSize: this.tabParams.size,
+				queryJson: JSON.stringify([{
+					paramName: 'classifyId',
+					paramValue: this.tabList[this.current].id,
+					operator: 0
+				}])
 			})
 			if (res.code === 200) {
 				this.flowList = res.data.content

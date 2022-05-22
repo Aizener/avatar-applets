@@ -1,38 +1,43 @@
 <template>
-	<view class="detail p-30" v-if="info">
-		<image class="detail-cover" src="https://img2.baidu.com/it/u=3550900606,1592535269&fm=253&fmt=auto&app=120&f=JPEG?w=1280&h=800" mode="aspectFill"></image>
-		<view class="detail-tags my-20">
-			<view
-				class="tag fs-20 color-333"
-				v-for="(item, idx) in info.tagName.split(',')"
-				:key="idx"
-			># {{ item }}</view>
+	<view class="detail p-30 u-skeleton">
+		<view>
+			<image class="detail-cover u-skeleton-fillet" :src="info.imageUrl" mode="aspectFill"></image>
+			<view class="detail-tags mt-20 u-skeleton-fillet" v-if="info.tagList">
+				<view
+					class="tag fs-20 color-333"
+					v-for="(item, idx) in info.tagList"
+					:key="idx"
+					@click="handleClickTag(item)"
+				># {{ item.name }}</view>
+			</view>
+			<view class="detail-operate mt-20 u-skeleton-fillet">
+				<view class="operate-item">
+					<image class="logo" src="/static/imgs/size.png" mode="aspectFit"></image>
+					<text>{{ info.width }}</text>
+				</view>
+				<view class="operate-item">
+					<image class="logo" src="/static/imgs/download-icon.png" mode="aspectFit"></image>
+					<text>{{ info.downloadNum }}次下载</text>
+				</view>
+				<view class="operate-item">
+					<image class="logo" src="/static/imgs/view.png" mode="aspectFit"></image>
+					<text>{{ info.viewNum }}次浏览</text>
+				</view>
+				<view class="operate-item">
+					<image class="logo" src="/static/imgs/price.png" mode="aspectFit"></image>
+					<text>{{ info.price }}金币</text>
+				</view>
+			</view>
+			<view class="detail-categories u-skeleton-fillet" v-if="info.classifyList">
+				<view
+					class="category color-fff fs-24"
+					v-for="(item, idx) in info.classifyList"
+					:key="idx"
+				>{{ item.name }}</view>
+			</view>
+			<view class="download-btn u-skeleton-fillet" @click="handleDownload">下载图片</view>
 		</view>
-		<view class="detail-operate">
-			<view class="operate-item">
-				<image class="logo" src="/static/imgs/size.png" mode="aspectFit"></image>
-				<text>{{ info.width }}</text>
-			</view>
-			<view class="operate-item">
-				<image class="logo" src="/static/imgs/download-icon.png" mode="aspectFit"></image>
-				<text>344次下载</text>
-			</view>
-			<view class="operate-item">
-				<image class="logo" src="/static/imgs/view.png" mode="aspectFit"></image>
-				<text>{{ info.viewNum }}次浏览</text>
-			</view>
-			<view class="operate-item">
-				<image class="logo" src="/static/imgs/price.png" mode="aspectFit"></image>
-				<text>{{ info.price }}金币</text>
-			</view>
-		</view>
-		<view class="detail-categories">
-			<view
-				class="category color-fff fs-24"
-				v-for="(item, idx) in info.classifyName.split(',')"
-				:key="idx"
-			>{{ item }}</view>
-		</view>
+		<u-skeleton :loading="loadingSkeleton" :animation="true" bgColor="#FFF"></u-skeleton>
 	</view>
 </template>
 
@@ -40,24 +45,59 @@
 	export default {
 		data() {
 			return {
-				info: null
+				info: null,
+				loadingSkeleton: true
 			};
 		},
 		onLoad(e) {
-			this.info = JSON.parse(decodeURIComponent(e.info))
+			const info = JSON.parse(decodeURIComponent(e.info))
+			this.id = info.id
+			this.name = info.name
 			this.getData()
 		},
 		onReady() {
-			this.$setTitle('图片详情-' + this.info.name)
+			this.$setTitle('图片详情-' + this.name)
 		},
 		methods: {
 			async getData() {
 				const res = await this.$u.api.getImageInfo({
-					imageId: this.info.id
+					imageId: this.id
 				})
+				this.loadingSkeleton = false
 				if (res.code === 200) {
 					this.info = res.data
 				}
+			},
+			handleClickTag(item) {
+				uni.redirectTo({
+					url: `/pages/flowlist/flowlist?params=${JSON.stringify({
+						name: '标签-' + item.name,
+						from: 'tag',
+						tagId: item.id
+					})}`
+				})
+			},
+			handleDownload() {
+				this.$showLoading('保存中')
+				uni.downloadFile({
+					url: this.info.imageUrl,
+					success: file => {
+						uni.saveImageToPhotosAlbum({
+							filePath: file.tempFilePath,
+							success: res => {
+								this.$toast('保存成功')
+							},
+							fail: err => {
+								setTimeout(() => {
+									this.$toast('保存失败：' + err.errMsg)
+								}, 500)
+							},
+							complete: () => {
+								this.$hideLoading()
+							}
+						})
+					}
+				})
 			}
 		}
 	}
@@ -65,6 +105,7 @@
 
 <style lang="scss">
 .detail {
+	min-height: calc(100vh - var(--window-top) - var(--window-bottom));
 	&-cover {
 		width: 690rpx;
 		height: 690rpx;
@@ -115,6 +156,20 @@
 				background-color: #FA8072;
 			}
 		}
+	}
+	.download-btn {
+		position: fixed;
+		width: calc(100% - 30rpx);
+		height: 70rpx;
+		transform: translateX(-50%);
+		left: 50%;
+		bottom: 30rpx;
+		background-color: orange;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		color: #fff;
+		font-size: 32rpx;
 	}
 }
 </style>
