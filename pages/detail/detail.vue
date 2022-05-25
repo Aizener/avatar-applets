@@ -13,19 +13,19 @@
 			<view class="detail-operate mt-20 u-skeleton-fillet">
 				<view class="operate-item">
 					<image class="logo" src="/static/imgs/size.png" mode="aspectFit"></image>
-					<text>{{ info.width }}</text>
+					<text>{{ info.width || '-' }} × {{ info.height || '-' }}</text>
 				</view>
 				<view class="operate-item">
 					<image class="logo" src="/static/imgs/download-icon.png" mode="aspectFit"></image>
-					<text>{{ info.downloadNum }}次下载</text>
+					<text>{{ info.downloadNum || '0' }}次下载</text>
 				</view>
 				<view class="operate-item">
 					<image class="logo" src="/static/imgs/view.png" mode="aspectFit"></image>
-					<text>{{ info.viewNum }}次浏览</text>
+					<text>{{ info.viewNum || '0' }}次浏览</text>
 				</view>
 				<view class="operate-item">
 					<image class="logo" src="/static/imgs/price.png" mode="aspectFit"></image>
-					<text>{{ info.price }}金币</text>
+					<text>{{ info.price || '0' }}金币</text>
 				</view>
 			</view>
 			<view class="detail-categories u-skeleton-fillet" v-if="info.classifyList">
@@ -50,6 +50,7 @@
 			};
 		},
 		onLoad(e) {
+			console.log(e.info)
 			const info = JSON.parse(decodeURIComponent(e.info))
 			this.id = info.id
 			this.name = info.name
@@ -69,7 +70,7 @@
 				}
 			},
 			handleClickTag(item) {
-				uni.redirectTo({
+				uni.navigateTo({
 					url: `/pages/flowlist/flowlist?params=${JSON.stringify({
 						name: '标签-' + item.name,
 						from: 'tag',
@@ -77,7 +78,15 @@
 					})}`
 				})
 			},
-			handleDownload() {
+			async handleDownload() {
+				const res = await this.$u.api.downloadCheck({
+					imageId: this.info.id,
+					uid: this.mUser.uid
+				})
+				if (res.code !== 200) {
+					this.$toast(res.message)
+					return
+				}
 				this.$showLoading('保存中')
 				uni.downloadFile({
 					url: this.info.imageUrl,
@@ -85,6 +94,7 @@
 						uni.saveImageToPhotosAlbum({
 							filePath: file.tempFilePath,
 							success: res => {
+								this.getData()
 								this.$toast('保存成功')
 							},
 							fail: err => {
@@ -160,7 +170,7 @@
 	.download-btn {
 		position: fixed;
 		width: calc(100% - 30rpx);
-		height: 70rpx;
+		height: 90rpx;
 		transform: translateX(-50%);
 		left: 50%;
 		bottom: 30rpx;

@@ -39,7 +39,7 @@
 				flowList: [],
 				status: 'loadmore',
 				info: null,
-				page: 0,
+				pageIndex: 0,
 				size: 30,
 				query: {},
 				from: '',
@@ -56,7 +56,8 @@
 			this.$setTitle(this.params.name)
 		},
 		onReachBottom() {
-			this.page ++
+			this.pageIndex ++
+			this.setQuery()
 			this.getImageList()
 		},
 		methods: {
@@ -65,37 +66,42 @@
 				this.getImageList()
 			},
 			setQuery() {
+				this.query = {
+					pageIndex: this.pageIndex,
+					pageSize: 30
+				}
 				if (this.params.from === 'search') {
-					this.query = {
+					Object.assign(this.query, {
 						queryJson: JSON.stringify([{
 							paramName: 'fuzzyQuery',
 							paramValue: this.params.name,
 							operator: 6
 						}])
-					}
+					})
 				} else if (this.params.from === 'top') {
-					this.query = {
-						pageIndex: 0,
-						pageSize: 30,
-						direction: 'desc',
-						sortName: this.params.field
-					}
+					Object.assign(this.query, {
+						queryJson: JSON.stringify([{
+							direction: 'desc',
+							sortName: this.params.field,
+							operator: 0
+						}])
+					})
 				} else if (this.params.from === 'tag') {
-					this.query = {
+					Object.assign(this.query, {
 						queryJson: JSON.stringify([{
 							paramName: 'tagId',
 							paramValue: this.params.tagId,
 							operator: 0
 						}])
-					} 
+					})
 				} else if (this.params.from === 'category') {
-					this.query = {
+					Object.assign(this.query, {
 						queryJson: JSON.stringify([{
 							paramName: 'categoryId',
 							paramValue: this.params.categoryId,
 							operator: 0
 						}])
-					} 
+					})
 				}
 			},
 			async getImageList() {
@@ -112,18 +118,22 @@
 			},
 			handleClickItem(item) {
 				uni.navigateTo({
-					url: `/pages/detail/detail?info=${JSON.stringify(item)}`
+					url: `/pages/detail/detail?info=${encodeURIComponent(JSON.stringify(item))}`
 				})
 			},
 			handleSwitchCategory(type) {
 				this.activeCategory = ['下载榜', '热度榜', '收藏榜'][type]
 				this.params.field = ['downloadNum', 'hotNum', 'collectionNum'][type]
+				this.pageIndex = 0
 				this.flowList = []
 				this.getImageList()
 			},
 			redirectToIndexPage() {
-				uni.redirectTo({
-					url: '/pages/category/category'
+				uni.switchTab({
+					url: '/pages/category/category',
+					fail: err => {
+						console.log(err)
+					}
 				})
 			},
 		}

@@ -1,5 +1,5 @@
 <template>
-	<view class="category p-30 skeleton">
+	<view class="category p-30 u-skeleton">
 		<view class="category-list u-skeleton-fillet">
 			<view class="category-list--item px-30 py-15" @click="navigatorFlowList(0)">
 				<text class="main-title fs-28">下载榜</text>
@@ -54,6 +54,12 @@
 		},
 		onLoad() {
 			this.getData()
+		},
+		async onPullDownRefresh() {
+			this.$showLoading('刷新中')
+			await this.getData()
+			this.$hideLoading()
+			uni.stopPullDownRefresh()
 		},
 		methods: {
 			getData() {

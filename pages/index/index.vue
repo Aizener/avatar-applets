@@ -44,7 +44,7 @@
 			></u-swiper>
 		</view>
 		<view class="hot mt-30 px-30 u-skeleton-fillet">
-			<v-title></v-title>
+			<v-title title="热门头像" operate-title="更多" @click="handleClickHotTitle"></v-title>
 			<view class="hot-swiper">
 				<u-swiper
 					mode="none"
@@ -52,6 +52,7 @@
 					border-radius="20"
 					bg-color="#fff"
 					name="imageUrl"
+					:circular="false"
 					:list="hotList"
 					:autoplay="false"
 					@click="handleClickHot"
@@ -85,6 +86,7 @@
 					<image
 						:src="item.imageUrl"
 						mode="aspectFill"
+						@click="handleClickImage(item)"
 					></image>
 				</view>
 			</view>

@@ -1,8 +1,8 @@
 <template>
 	<view class="v-title flex flex-row-between flex-col-center">
-		<text class="v-title--main">热门头像</text>
-		<view class="v-title--operate flex flex-col-center">
-			<text>更多</text>
+		<text class="v-title--main">{{ title }}</text>
+		<view class="v-title--operate flex flex-col-center" @click="$emit('click')">
+			<text>{{ operateTitle }}</text>
 			<u-icon class="logo" size="24" name="arrow-right"></u-icon>
 		</view>
 	</view>
@@ -14,6 +14,10 @@ export default {
 		title: {
 			type: String,
 			required: true
+		},
+		operateTitle: {
+			type: String,
+			required: false
 		}
 	}
 }

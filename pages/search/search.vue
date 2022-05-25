@@ -52,7 +52,7 @@
 				}
 				uni.navigateTo({
 					url: `/pages/flowlist/flowlist?params=${JSON.stringify({
-						name: this.keyword.trim(),
+						name: '搜索-' + this.keyword.trim(),
 						from: 'search'
 					})}`
 				})

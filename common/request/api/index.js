@@ -8,6 +8,7 @@ const initApis = vm => ({
 	getImageInfo: (params = {}) => vm.$u.post('/image/getImageInfo', params),
 	getTagList: (params = {}) => vm.$u.post('/tag/getTagList', params),
 	getAllClassify: (params = {}) => vm.$u.post('/classify/getAllClassify', params),
+	downloadCheck: (params = {}) => vm.$u.post('/user/downloadCheck', params)
 })
 
 export default initApis

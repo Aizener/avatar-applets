@@ -1,7 +1,0 @@
-{
-  "navigationBarTitleText": "头像详情",
-  "enablePullDownRefresh": false,
-  "usingComponents": {
-    "u-skeleton": "/uview-ui/components/u-skeleton/u-skeleton"
-  }
-}
