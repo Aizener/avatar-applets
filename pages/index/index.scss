@@ -57,12 +57,19 @@
 
 .hot {
 	&-swiper {
+		width: 100%;
+		white-space: nowrap;
 		margin: 30rpx 0;
-		.u-swiper {
-			&-item {
-				width: 240rpx !important;
-				padding-right: 20rpx !important;
-			}
+		overflow-y: auto;
+	}
+	.hot-item {
+		display: inline-block;
+		width: 240rpx;
+		height: 240rpx;
+		padding-right: 20rpx;
+		image {
+			width: 100%;
+			height: 100%;
 		}
 	}
 }

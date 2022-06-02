@@ -35,22 +35,32 @@
 					:key="idx"
 				>{{ item.name }}</view>
 			</view>
-			<view class="download-btn u-skeleton-fillet" @click="handleDownload">下载图片</view>
+			<view class="operate-btn u-skeleton-fillet">
+				<template v-if="!loadingSkeleton">
+					<view class="download-btn btn" @click="handleDownload">下载</view>
+					<view class="btn" :class="[info.isUserCollect === 1 && 'like-btn']" @click="handleLikeOrUnLike">{{ info.isUserCollect === 1 ? '已收藏' : '收藏' }}</view>
+				</template>
+			</view>
 		</view>
+		<NotLogin v-model="isNotLogin" />
 		<u-skeleton :loading="loadingSkeleton" :animation="true" bgColor="#FFF"></u-skeleton>
 	</view>
 </template>
 
 <script>
+	import NotLogin from '@/components/not-login.vue'
 	export default {
+		components: {
+			NotLogin
+		},
 		data() {
 			return {
 				info: null,
-				loadingSkeleton: true
+				loadingSkeleton: true,
+				isNotLogin: false
 			};
 		},
 		onLoad(e) {
-			console.log(e.info)
 			const info = JSON.parse(decodeURIComponent(e.info))
 			this.id = info.id
 			this.name = info.name
@@ -61,9 +71,13 @@
 		},
 		methods: {
 			async getData() {
-				const res = await this.$u.api.getImageInfo({
+				const query = {
 					imageId: this.id
-				})
+				}
+				if (this.mUser) {
+					query.uid = this.mUser.uid
+				}
+				const res = await this.$u.api.getImageInfo(query)
 				this.loadingSkeleton = false
 				if (res.code === 200) {
 					this.info = res.data
@@ -79,10 +93,17 @@
 				})
 			},
 			async handleDownload() {
-				const res = await this.$u.api.downloadCheck({
-					imageId: this.info.id,
-					uid: this.mUser.uid
-				})
+				if (!this.mUser) {
+					this.isNotLogin = true
+					return
+				}
+				const query = {
+					imageId: this.info.id
+				}
+				if (this.mUser) {
+					query.uid = this.mUser.uid
+				}
+				const res = await this.$u.api.downloadCheck(query)
 				if (res.code !== 200) {
 					this.$toast(res.message)
 					return
@@ -108,6 +129,23 @@
 						})
 					}
 				})
+			},
+			async handleLikeOrUnLike() {
+				if (!this.mUser) {
+					this.isNotLogin = true
+					return
+				}
+				const type = this.info.isUserCollect === 1 ? 0 : 1
+				const res = await this.$u.api.collectImage({
+					uid: this.mUser.uid,
+					imageId: this.info.id,
+					isCollect: type
+				})
+				if (res.code === 200) {
+					this.info.isUserCollect = type
+				} else {
+					this.$toast(res.message)
+				}
 			}
 		}
 	}
@@ -115,7 +153,8 @@
 
 <style lang="scss">
 .detail {
-	min-height: calc(100vh - var(--window-top) - var(--window-bottom));
+	overflow-y: auto;
+	height: calc(100vh - var(--window-top) - var(--window-bottom) - 100rpx);
 	&-cover {
 		width: 690rpx;
 		height: 690rpx;
@@ -167,19 +206,38 @@
 			}
 		}
 	}
-	.download-btn {
+	.operate-btn {
 		position: fixed;
 		width: calc(100% - 30rpx);
-		height: 90rpx;
-		transform: translateX(-50%);
 		left: 50%;
+		transform: translateX(-50%);
+		height: 90rpx;
 		bottom: 30rpx;
-		background-color: orange;
 		display: flex;
-		justify-content: center;
-		align-items: center;
-		color: #fff;
-		font-size: 32rpx;
+		justify-content: space-between;
+		.btn {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			color: #fff;
+			font-size: 32rpx;
+			flex: 1;
+			border-radius: 10rpx;
+			color: gray;
+			border: 1px solid gray;
+			transition: all .3s;
+		}
+		.download-btn {
+			color: #fff;
+			border: none;
+			background-color: orange;
+			margin-right: 20rpx;
+		}
+		.like-btn {
+			color: #fff;
+			border: none;
+			background-color: green;
+		}
 	}
 }
 </style>

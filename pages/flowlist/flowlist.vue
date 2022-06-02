@@ -1,5 +1,5 @@
 <template>
-	<view class="loadmore px-30 py-10" :style="{ paddingTop: from === 'top' ? '112rpx' : '' }">
+	<view class="loadmore px-30 py-10" :style="{ height: pageHeight + 'px' }">
 		<view class="loadmore-top" v-if="from === 'top'">
 			<view class="list">
 				<view class="list-item download" :class="[activeCategory === '下载榜' && 'active']" @click="handleSwitchCategory(0)">下载榜</view>
@@ -7,11 +7,11 @@
 				<view class="list-item like" :class="[activeCategory === '收藏榜' && 'active']" @click="handleSwitchCategory(2)">收藏榜</view>
 			</view>
 		</view>
-		<view class="loadmore-list">
+		<view class="loadmore-list" :style="{ marginTop: from === 'top' ? '112rpx' : '0', transform: `translateY(${tTop}px)` }">
 			<view
 				class="loadmore-list--item"
-				v-for="(item, idx) in flowList"
-				:key="idx"
+				v-for="(item, idx) in virtualList"
+				:key="item.id"
 			>
 				<view class="before">
 					<u-loading mode="circle"></u-loading>
@@ -37,44 +37,99 @@
 		data() {
 			return {
 				flowList: [],
+				virtualList: [],
 				status: 'loadmore',
+				pageHeight: 0,
 				info: null,
 				pageIndex: 0,
 				size: 30,
 				query: {},
 				from: '',
+				tTop: 0,
 				activeCategory: ''
 			};
 		},
-		onLoad(e) {
+		async onLoad(e) {
 			this.params = JSON.parse(decodeURIComponent(e.params))
 			this.from = this.params.from
 			this.activeCategory = this.params.name
-			this.getData()
+			this.lastScrollTop = -1
+			await this.getData()
 		},
-		onReady() {
+		async onReady() {
 			this.$setTitle(this.params.name)
+			this.rowHeight = 115
+			this.pageHeight = uni.getSystemInfoSync().windowHeight
+			this.pageRowNums = Math.ceil((this.pageHeight - (this.from === 'top' ? 56 : 0)) / this.rowHeight)
+			this.scrollTop = 0
+			this.lastStart = -1
+			this.safeRowNums = this.pageRowNums
+			this.handle = this.throttle(this.setVirtualList)
 		},
-		onReachBottom() {
+		async onPageScroll(e) {
+			this.scrollTop = e.scrollTop
+			// this.setVirtualList()
+			this.handle()
+		},
+		onReachBottom(e) {
 			this.pageIndex ++
 			this.setQuery()
 			this.getImageList()
 		},
 		methods: {
+			throttle(func, delay = 50) {
+				let timer = null
+				return function () {
+					if (timer) {
+						return
+					}
+					this.listTimer = setTimeout(() => {
+						func.apply(this, arguments)
+						this.listTimer && clearTimeout(this.listTimer)
+						this.listTimer = null
+					}, delay)
+				}
+			},
+			async setVirtualList() {
+				if (this.lastScrollTop === this.scrollTop) {
+					return
+				}
+				const notFloortStart = this.scrollTop / this.rowHeight
+				const start = Math.floor(notFloortStart)
+				if (Math.abs(notFloortStart - this.lastStart) < 1) {
+					if (this.scrollTop <= 10) {
+						this.tTop = 0
+					}
+					return
+				}
+				this.lastScrollTop = this.scrollTop
+				this.lastStart = notFloortStart
+				const end = start + this.safeRowNums
+				this.sliceStart = start < this.safeRowNums ? 0 : start - this.safeRowNums
+				this.sliceEnd = end > this.totalRowNums - this.safeRowNums ? this.totalRowNums : start + this.pageRowNums + this.safeRowNums
+				this.virtualList = this.flowList.slice(this.sliceStart * 3, this.sliceEnd * 3)
+				this.tTop = Math.round(this.scrollTop) - (start > this.safeRowNums ? this.safeRowNums * this.rowHeight : start * this.rowHeight)
+				console.log(this.scrollTop, start, end, this.tTop, this.lastStart, start)
+			},
+			async getPageHeight() {
+				const res = await this.$getBounding('.loadmore')
+				return res.height
+			},
 			async getData() {
-				this.setQuery()
-				this.getImageList()
+				await this.setQuery()
+				await this.getImageList()
 			},
 			setQuery() {
 				this.query = {
 					pageIndex: this.pageIndex,
 					pageSize: 30
 				}
+				this.requestMethod = this.$u.api.getImageList
 				if (this.params.from === 'search') {
 					Object.assign(this.query, {
 						queryJson: JSON.stringify([{
 							paramName: 'fuzzyQuery',
-							paramValue: this.params.name,
+							paramValue: this.params.name.split('-')[1],
 							operator: 6
 						}])
 					})
@@ -95,10 +150,11 @@
 						}])
 					})
 				} else if (this.params.from === 'category') {
+					this.requestMethod = this.$u.api.getClassifyImageList
 					Object.assign(this.query, {
 						queryJson: JSON.stringify([{
-							paramName: 'categoryId',
-							paramValue: this.params.categoryId,
+							paramName: 'classifyId',
+							paramValue: this.params.classifyId,
 							operator: 0
 						}])
 					})
@@ -106,14 +162,22 @@
 			},
 			async getImageList() {
 				this.status = 'loading'
-				const res = await this.$u.api.getImageList(this.query)
+				const res = await this.requestMethod(this.query)
 				if (res.code === 200) {
 					if (this.flowList.length >= res.data.totalElements) {
 						this.status = 'nomore'
 					} else {
 						this.status = 'loadmore'
 					}
+					if (!this.totalRowNums) {
+						this.totalRowNums = Math.ceil(res.data.totalElements / 3)
+					}
 					this.flowList = [...this.flowList, ...res.data.content]
+					if (this.pageIndex > 0) {
+						this.pageHeight += Math.ceil(res.data.content.length / 3) * 115
+					} else {
+						this.setVirtualList()
+					}
 				}
 			},
 			handleClickItem(item) {
@@ -124,8 +188,13 @@
 			handleSwitchCategory(type) {
 				this.activeCategory = ['下载榜', '热度榜', '收藏榜'][type]
 				this.params.field = ['downloadNum', 'hotNum', 'collectionNum'][type]
-				this.pageIndex = 0
+				this.pageHeight = uni.getSystemInfoSync().windowHeight
+				this.pageRowNums = Math.ceil((this.pageHeight - (this.from === 'top' ? 56 : 0)) / this.rowHeight)
+				this.lastStart = -1
+				this.safeRowNums = this.pageRowNums
+				this.virtualList = []
 				this.flowList = []
+				this.pageIndex = 0
 				this.getImageList()
 			},
 			redirectToIndexPage() {
@@ -142,9 +211,13 @@
 
 <style lang="scss">
 .loadmore {
+	overflow-x: hidden;
 	&-list {
 		display: flex;
 		flex-wrap: wrap;
+		position: absolute;
+		overflow-x: hidden;
+		width: 100%;
 		&--item {
 			width: 230rpx;
 			height: 230rpx;

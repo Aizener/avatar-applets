@@ -23,6 +23,7 @@
 				class="my-list--item flex flex-row-between flex-col-center py-20"
 				v-for="(item, itemIdx) in items"
 				:key="itemIdx"
+				@click="handleClickItem(item)"
 			>
 				<view class="left flex flex-col-center">
 					<image :src="item.logo" mode="aspectFit"></image>
@@ -31,27 +32,28 @@
 				<u-icon class="right" size="24" name="arrow-right"></u-icon>
 			</view>
 		</view>
-		<view class="version color-ccc fs-20 p-fixed w-100i text-center">版本号 v0.0.11</view>
+		<view class="version color-ccc fs-20 p-fixed w-100i text-center">版本号 v0.5.28</view>
 	</view>
 </template>
 
 <script>
-	import { mapMutations } from 'vuex'
+	import { mapMutations } from 'vuex' 	
 	export default {
 		data() {
 			return {
 				list: [
 					[
-						{ logo: require('@/static/imgs/score.png'), title: '我的金币' },
-						{ logo: require('@/static/imgs/like.png'), title: '我的收藏' }
+						{ logo: require('@/static/imgs/score.png'), title: '我的金币', path: '/pages/money/money' },
+						{ logo: require('@/static/imgs/like.png'), title: '我的收藏', path: '/pages/my-imgs/my-imgs?title=我的收藏' }
 					],
 					[
-						{ logo: require('@/static/imgs/download.png'), title: '我的下载' },
-						{ logo: require('@/static/imgs/history.png'), title: '最近浏览' }
+						{ logo: require('@/static/imgs/download.png'), title: '我的下载', path: '/pages/my-imgs/my-imgs?title=我的下载' },
+						{ logo: require('@/static/imgs/history.png'), title: '最近浏览', path: '/pages/my-imgs/my-imgs?title=最近浏览' }
 					],
 					[
-						{ logo: require('@/static/imgs/report.png'), title: '意见反馈' },
-						{ logo: require('@/static/imgs/about.png'), title: '关于我们' }
+						{ logo: require('@/static/imgs/report.png'), title: '意见反馈', path: '/pages/feedback/feedback' },
+						{ logo: require('@/static/imgs/about.png'), title: '关于我们', path: '/pages/about/about' },
+						{ logo: require('@/static/imgs/logout.png'), title: '退出登录', type: 'logout' },
 					]
 				]
 			};
@@ -63,10 +65,43 @@
 				uni.stopPullDownRefresh()
 			})
 		},
+		onShow() {
+			if (this.mUser) {
+				this.getMyInfo()
+			}
+		},
 		methods: {
 			...mapMutations('userStore', ['muUpdateUser']),
+			async getMyInfo() {
+				const res = await this.$u.api.getUserInfo({
+					uid: this.mUser.uid
+				})
+				if (res.code === 200) {
+					delete res.data.auth
+					this.muUpdateUser(Object.assign(this.mUser, res.data))
+				}
+			},
+			handleClickItem(item) {
+				if (item.type) {
+					if (item.type === 'logout') {
+						this.$confirm({
+							title: '登出提示',
+							content: '你确定要退出登录吗？'
+						}).then(res => {
+							if (res.confirm) {
+								this.muUpdateUser(null)
+							}
+						})
+						return
+					}
+				}
+				uni.navigateTo({
+					url: item.path
+				})
+			},
 			getUserInfo() {
 				let code = ''
+				this.$showLoading()
 				uni.login({
 					provider: 'weixin',
 					success: res => {
@@ -77,6 +112,7 @@
 				uni.getUserProfile({
 					desc: '方便系统为你更好的服务~',
 					success: async e => {
+						this.$hideLoading()
 						if (e.errMsg === 'getUserProfile:ok') {
 							const { encryptedData, iv } = e
 							const res = await this.$u.api.login({ encryptedData, iv, code })
@@ -85,6 +121,9 @@
 								this.muUpdateUser(res.data)
 							}
 						}
+					},
+					fail: err => {
+						this.$hideLoading()
 					}
 				})
 			}

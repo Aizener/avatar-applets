@@ -96,7 +96,7 @@
 					url: `/pages/flowlist/flowlist?params=${JSON.stringify({
 						name: '分类-' + item.name,
 						from: 'category',
-						categoryId: item.id
+						classifyId: item.id
 					})}`
 				})
 			},

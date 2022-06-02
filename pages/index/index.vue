@@ -46,7 +46,15 @@
 		<view class="hot mt-30 px-30 u-skeleton-fillet">
 			<v-title title="热门头像" operate-title="更多" @click="handleClickHotTitle"></v-title>
 			<view class="hot-swiper">
-				<u-swiper
+				<view
+					class="hot-item"
+					v-for="(item, idx) in hotList"
+					:key="idx"
+					@click="handleClickHot(idx)"
+				>
+					<image :src="item.imageUrl" mode="aspectFill"></image>
+				</view>
+				<!-- <u-swiper
 					mode="none"
 					height="240"
 					border-radius="20"
@@ -56,7 +64,7 @@
 					:list="hotList"
 					:autoplay="false"
 					@click="handleClickHot"
-				></u-swiper>
+				></u-swiper> -->
 			</view>
 		</view>
 		<view class="tab px-30 u-skeleton-fillet">
