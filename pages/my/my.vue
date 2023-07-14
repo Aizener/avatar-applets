@@ -32,7 +32,7 @@
 				<u-icon class="right" size="24" name="arrow-right"></u-icon>
 			</view>
 		</view>
-		<view class="version color-ccc fs-20 p-fixed w-100i text-center">版本号 v0.5.28</view>
+		<view class="version color-ccc fs-20 p-fixed w-100i text-center">版本号 v0.5.31</view>
 	</view>
 </template>
 

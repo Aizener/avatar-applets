@@ -13,7 +13,7 @@ const install = (Vue, vm) => {
 	
 	Vue.prototype.$u.http.interceptor.request = (config) => {
 		config.data = qs.stringify(config.data)
-		console.log(config)
+		console.log('request: ', config)
 		if (vm.mUser && vm.mUser.auth) {
 			config.header['alice-wonderland'] = `rabbit ${vm.mUser.auth.accessToken}`
 		} else {
@@ -33,6 +33,7 @@ const install = (Vue, vm) => {
 	}
 	
 	Vue.prototype.$u.http.interceptor.response = (res) => {
+		console.log('response:', res)
 		return res
 	}
 }

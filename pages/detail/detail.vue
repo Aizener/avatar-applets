@@ -62,9 +62,10 @@
 		},
 		onLoad(e) {
 			const info = JSON.parse(decodeURIComponent(e.info))
-			this.id = info.id
-			this.name = info.name
-			this.getData()
+			console.log('ready', info)
+			this.id = info.id || info.imageId
+			this.name = info.name || ''
+			this.getData()	
 		},
 		onReady() {
 			this.$setTitle('图片详情-' + this.name)
@@ -81,6 +82,8 @@
 				this.loadingSkeleton = false
 				if (res.code === 200) {
 					this.info = res.data
+					this.name = this.info.name
+					this.$setTitle('图片详情-' + this.name)
 				}
 			},
 			handleClickTag(item) {

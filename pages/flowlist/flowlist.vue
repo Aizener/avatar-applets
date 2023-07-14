@@ -1,5 +1,6 @@
 <template>
-	<view class="loadmore px-30 py-10" :style="{ height: pageHeight + 'px' }">
+	<view class="loadmore px-30 py-10">
+		 <!-- :style="{ height: pageHeight + 'px' }" -->
 		<view class="loadmore-top" v-if="from === 'top'">
 			<view class="list">
 				<view class="list-item download" :class="[activeCategory === '下载榜' && 'active']" @click="handleSwitchCategory(0)">下载榜</view>
@@ -10,8 +11,8 @@
 		<view class="loadmore-list" :style="{ marginTop: from === 'top' ? '112rpx' : '0', transform: `translateY(${tTop}px)` }">
 			<view
 				class="loadmore-list--item"
-				v-for="(item, idx) in virtualList"
-				:key="item.id"
+				v-for="(item, idx) in flowList"
+				:key="idx"
 			>
 				<view class="before">
 					<u-loading mode="circle"></u-loading>
@@ -69,7 +70,7 @@
 		async onPageScroll(e) {
 			this.scrollTop = e.scrollTop
 			// this.setVirtualList()
-			this.handle()
+			// this.handle()
 		},
 		onReachBottom(e) {
 			this.pageIndex ++
@@ -173,14 +174,15 @@
 						this.totalRowNums = Math.ceil(res.data.totalElements / 3)
 					}
 					this.flowList = [...this.flowList, ...res.data.content]
-					if (this.pageIndex > 0) {
-						this.pageHeight += Math.ceil(res.data.content.length / 3) * 115
-					} else {
-						this.setVirtualList()
-					}
+					// if (this.pageIndex > 0) {
+					// 	this.pageHeight += Math.ceil(res.data.content.length / 3) * 115
+					// } else {
+					// 	this.setVirtualList()
+					// }
 				}
 			},
 			handleClickItem(item) {
+				console.log(item)
 				uni.navigateTo({
 					url: `/pages/detail/detail?info=${encodeURIComponent(JSON.stringify(item))}`
 				})
@@ -188,11 +190,11 @@
 			handleSwitchCategory(type) {
 				this.activeCategory = ['下载榜', '热度榜', '收藏榜'][type]
 				this.params.field = ['downloadNum', 'hotNum', 'collectionNum'][type]
-				this.pageHeight = uni.getSystemInfoSync().windowHeight
-				this.pageRowNums = Math.ceil((this.pageHeight - (this.from === 'top' ? 56 : 0)) / this.rowHeight)
-				this.lastStart = -1
-				this.safeRowNums = this.pageRowNums
-				this.virtualList = []
+				// this.pageHeight = uni.getSystemInfoSync().windowHeight
+				// this.pageRowNums = Math.ceil((this.pageHeight - (this.from === 'top' ? 56 : 0)) / this.rowHeight)
+				// this.lastStart = -1
+				// this.safeRowNums = this.pageRowNums
+				// this.virtualList = []
 				this.flowList = []
 				this.pageIndex = 0
 				this.getImageList()
@@ -215,7 +217,7 @@
 	&-list {
 		display: flex;
 		flex-wrap: wrap;
-		position: absolute;
+		// position: absolute;
 		overflow-x: hidden;
 		width: 100%;
 		&--item {
